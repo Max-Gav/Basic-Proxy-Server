@@ -1,14 +1,10 @@
 import socket
-import threading
+from concurrent.futures import ThreadPoolExecutor
 buff_size = 1024
 server_host = "127.0.0.1"
 server_port = 8801
 
-def handleClientRequest(client_socket):
-    remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    remote_socket.connect((server_host, server_port))
-    print("Proxy connecting to the server")
-    
+def handleClientRequest(client_socket, remote_socket):
     while True:
         print("Waiting for the client to send a request")
         request_data = client_socket.recv(buff_size).decode()
@@ -33,13 +29,19 @@ def startProxyServer():
     proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     proxy_socket.bind(("0.0.0.0", 8800))
     proxy_socket.listen(5)
-    print("Starting a proxy server")
+    print("Starting proxy server")
+    
+    remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    remote_socket.connect((server_host, server_port))
+    print("Proxy connecting to the server")
+    
+    thread_pool = ThreadPoolExecutor(max_workers=3)
     
     while True:
         client_socket, client_address = proxy_socket.accept()
         print("Accepted a client connection from " + client_address[0] + ":" + str(client_address[1]))
-        client_request_thread = threading.Thread(target=handleClientRequest, args=(client_socket))
-        client_request_thread.start()
+
+        thread_pool.submit(handleClientRequest, client_socket, remote_socket)
         
         
 

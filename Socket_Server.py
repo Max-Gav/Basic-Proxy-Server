@@ -9,7 +9,7 @@ def startBasicServer():
 
     while True:
         client_socket, client_address = server_socket.accept()
-        print("Accepted a proxy connection")
+        print("Accepted proxy connection")
         
         while True:
             request_data = client_socket.recv(1024).decode()
