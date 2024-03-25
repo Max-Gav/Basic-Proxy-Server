@@ -3,7 +3,7 @@ buff_size = 1024
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(("127.0.0.1", 8800))
-print("Connecting to the proxy")
+print("Connected to the proxy")
 
 while True:
     print("Enter your name: ")
